@@ -21,7 +21,7 @@ router.get("/posts/:postid", asyncHandler(async (req, res, next) => {
     err.status = 404;
     return next(err);
   }
-  const allCommentsToAPost = await Comment.find({ post: req.params.postid }).exec();
+  const allCommentsToAPost = await Comment.find({ post: req.params.postid }).sort({ timestamp: -1 }).exec();
 
   res.json({ post: post, allCommentsToAPost: allCommentsToAPost });
 }));
