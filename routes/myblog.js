@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const bcrypt = require('bcryptjs');
 
 const passportConfig = require("../passport-config");
 
@@ -16,28 +17,18 @@ router.get("/posts", passport.authenticate("jwt", { session: false }), asyncHand
     res.status(200).json(allPosts);
 }));
 
-// router.get("/log-in", asyncHandler(async (req, res, next) => {
-//     res.json({ "message": "Route to log in (GET)" });
-// }));
-
 router.post("/log-in", asyncHandler(async (req, res, next) => {
-    User.findOne({ username: req.body.username })
-        .then((user) => {
-            if (!user) {
-                res.status(401).json({ success: false, message: "Incorrect username" });
-            };
-            const isValid = passportConfig.verifyLogin(req.body.password, user.password);
-            if (isValid) {
-                const tokenObject = passportConfig.issueJWT(user);
-                res.status(200).json({ success: true, user: user, token: tokenObject.token, expiresIn: tokenObject.expires });
-            } else {
-                console.log(req.body.password, user.password);
-                res.status(401).json({ success: false, message: "Incorrect password" });
-            }
-        })
-        .catch((err) => {
-            next(err);
-        })
+    const user = await User.findOne({ username: req.body.username });
+    if (!user) {
+        return res.json({ success: false, message: "Incorrect username" });
+    };
+    const isValid = await bcrypt.compare(req.body.password, user.password);
+    if (isValid) {
+        const tokenObject = passportConfig.issueJWT(user);
+        return res.status(200).json({ success: true, user: user, token: tokenObject.token, expiresIn: tokenObject.expires });
+    } else {
+        return res.json({ success: false, message: "Incorrect password" });
+    }
 }));
 
 router.get("/posts/:postid", passport.authenticate("jwt", { session: false }), getPost, asyncHandler(async (req, res, next) => {

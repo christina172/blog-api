@@ -1,5 +1,4 @@
 require("dotenv").config();
-const bcrypt = require('bcryptjs');
 const jsonwebtoken = require("jsonwebtoken");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
@@ -42,17 +41,5 @@ function issueJWT(user) {
     }
 };
 
-async function verifyLogin(password, hash) {
-    bcrypt.compare(password, hash, (err, res) => {
-        if (res) {
-            return true;
-        } else {
-            return false;
-        }
-    })
-};
-
-
 module.exports.initializePassport = initializePassport;
 module.exports.issueJWT = issueJWT;
-module.exports.verifyLogin = verifyLogin;
