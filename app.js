@@ -9,6 +9,8 @@ const cors = require('cors');
 const passport = require('passport');
 
 const debug = require("debug");
+const compression = require("compression");
+const helmet = require("helmet");
 
 const passportConfig = require("./passport-config");
 
@@ -16,6 +18,14 @@ const indexRouter = require('./routes/index');
 const blogRouter = require('./routes/myblog');
 
 const app = express();
+
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
 
 // Set up mongoose connection
 const mongoose = require("mongoose");
@@ -38,6 +48,10 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(helmet());
+app.use(compression()); // Compress all routes
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/blog', indexRouter);

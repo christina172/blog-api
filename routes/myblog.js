@@ -56,7 +56,6 @@ router.post("/posts", passport.authenticate("jwt", { session: false }), [
 ]);
 
 router.patch("/posts/:postid", passport.authenticate("jwt", { session: false }), getPost, asyncHandler(async (req, res, next) => {
-    console.log(req.body);
     if (req.body.title != null) {
         body("title").trim().escape();
         res.post.title = req.body.title

@@ -27,7 +27,7 @@ function initializePassport(passport) {
 };
 
 function issueJWT(user) {
-    const expiresIn = "2m";
+    const expiresIn = "30m";
 
     const payload = {
         sub: user._id
